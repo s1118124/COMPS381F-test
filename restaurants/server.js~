@@ -1,0 +1,129 @@
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var session = require('express-session');
+var fileUpload = require('express-fileupload');
+
+//--googlemap
+/**var assert = require('assert');
+var mongourl = 'mongodb://student:password@ds031873.mlab.com:31873/comps381f';
+var MongoClient = require('mongodb').MongoClient;
+**/
+//--googlemap
+
+var SECRETKEY = 'I want to pass COMPS381F';
+
+app.use(fileUpload());
+app.use(bodyParser.json());
+app.use(session({
+	secret: SECRETKEY,
+	resave: true,
+	saveUninitialized: true
+}));
+
+var restaurants = [
+	{name: 'Apple iPad Pro', photo: 100, id: '001'},
+	{name: 'Apple iPhone 7', photo: 50, id: '002'},
+	{name: 'Apple Macbook', photo: 1627, id: '003'}
+];
+
+//var cart = [];
+
+app.set('view engine', 'ejs');
+
+//may need to fit the request as: GET /api/read
+app.get("/read", function(req,res) {
+	res.render("list", {c: restaurants});
+});
+
+app.get('/showdetails', function(req,res) {
+	if (req.query.id != null) {
+		for (var i=0; i<restaurants.length; i++) {
+			if (restaurants[i].id == req.query.id) {
+				var restaurant = restaurants[i];
+				break;
+			}
+		}
+		if (restaurants != null) {
+			res.render('details', {c: restaurants});
+		} else {
+			res.status(500).end(req.query.id + ' not found!');
+		}
+	} else {
+		res.status(500).end('id missing!');
+	}
+        //--Googlemap
+        /**MongoClient.connect(mongourl, function(err, db) {
+    assert.equal(err,null);
+    console.log('Connected to MongoDB\n');
+		var criteria = {'id':req.query.id};
+    findCafe(db,criteria,function(cafe) {
+      db.close();
+      console.log('Disconnected MongoDB\n');
+			res.render('gmap',{name:cafe.name,lat:cafe.coord[0],lon:cafe.coord[1],zoom:18});
+			res.end();
+		});
+	});**/
+        //--Googlemap
+});
+
+//--googlemap function
+/**
+function findCafe(db,criteria,callback) {
+	db.collection('cafes').findOne(criteria,function(err,result) {
+		assert.equal(err,null);
+		callback(result);
+	});
+}**/
+//--googlemap function
+
+/**
+app.get('/shoppingcart', function(req,res) {
+	//res.end('coming soon!')
+        res.render("shoppingcart", {c: restaurants});
+});
+**/
+
+//add code for new
+app.get('/new', function(req, res){
+        res.render("new", {c: restaurants});
+});
+
+//add code for create new
+//may need to fit the request as: POST /api/create
+app.post('/create', function(req, res){
+        //do sth to create
+        res.end('coming soon!')
+});
+
+//useless code in this
+app.get('/add2cart', function(req,res) {
+	//res.end('coming soon!')
+/**	
+	var product;
+	if (req.query.id != null) {
+		for (var i=0; i<products.length; i++) {
+			if (products[i].id == req.query.id) {
+				product = products[i];
+				break;
+			}
+		}
+		if (product != null) {
+
+			res.render('details', {c: product});
+		} else {
+			res.status(500).end(req.query.id + ' not found!');
+		}
+	} else {
+		res.status(500).end('id missing!');
+	}**/
+});
+
+//useless code in this
+/**
+app.get('/emptycart',function(req,res) {
+	res.end('coming soon!')
+})
+**/
+
+app.listen(process.env.PORT || 8099);
