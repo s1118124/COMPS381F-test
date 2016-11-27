@@ -1,0 +1,14 @@
+{
+    "name": "server",
+    "description": "Sample ExpressJS server",
+    "author": "Raymond SO <rso@ouhk.edu.hk>",
+    "version": "0.0.1",
+    "dependencies": {
+        "mongodb": "*",
+        "express": "*",
+        "ejs": "*",
+        "cookie-session": "*"
+    },
+    "engine": "node >= 0.10.0",
+    "scripts": {"start": "node server"}
+}
