@@ -7,19 +7,31 @@
 </head>
 <BODY>
 <H2><%= c.name %></H2>
-<!--<p>ID: <%= c.id %></p>
-<p>Price: <%= c.price %></p>
-<p>Stock: <%= c.stock %></p>-->
 <% if (c.photo != null) { %>
 <p>
   <img src="data:<%= c.mimetype %>;base64,<%= c.photo %>">
 <br>
 <% } %>
+<p>Name: <%= c.name %></p>
+<p>Cuisine: <%= c.cuisine %></p>
+<p>Street: <%= c.street %></p>
+<p>Building: <%= c.building %></p>
+<p>Zipcode: <%= c.zipcode %></p>
+<p>GPS: [ <%= c.lon %>,  <%=c.lat %> ]</p>
+<p>Rating: <ol><li> <%=c.rate %></li></ol></p>
+<p>Created by: </p>
+
 
 <!--Googlemap-->
 <p>Google map: coming soon(map will be shown in here)</p>
 <!--Googlemap-->
 
-<!--<a href=/add2cart?id=<%= c.id %>>add to shopping cart</a>-->
+<!--<a href/add2cart?id=<%= c.id %>>add to shopping cart</a>-->
+<a href=/rate>Rate</a>
+<a href=/change>Edit</a>
+<a href=/remove>Delete</a>
+<a href=/list>Go Back</a>
+
+
 </BODY>
 </HTML>
