@@ -36,19 +36,27 @@ var restaurants = [
 
 app.set('view engine', 'ejs');
 
-var restaurants = [];
+//var restaurants = [];
 
 //may need to fit the request as: GET /api/read
-app.get("/read", function(req,res) {
+app.get("/read", function(req, res) {
+	//var restaurants = [];
 	MongoClient.connect(mongourl, function(err, db) {
-		assert.equal(err,null);
-		console.log('Connected to MongoDB\n');
-		restaurants = db.collection('restaurants').find();
-		db.close();
-		console.log('Disconnected MongoDB\n');
+	assert.equal(err,null);
+	console.log('Connected to MongoDB\n');
+	db.collection('restaurants').find().toArray(function(err, result){
+			if (err) throw err
+				console.log(result);
+				res.render("list", {restaurants: result});
+		})
+	
+	db.close();
+	console.log('Disconnected MongoDB\n');
 	});
-	res.render("list", {c: restaurants});
+	
+
 });
+	//res.render("list", {restaurants: result});
 
 app.get('/showdetails', function(req,res) {
 	/**
