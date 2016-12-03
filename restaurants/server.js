@@ -1,3 +1,9 @@
+//var http = require('http');
+//var url  = require('url');
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+var ObjectId = require('mongodb').ObjectID;
+var mongourl = 'mongodb://developer:developer@ds033046.mlab.com:33046/s1118124';
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -20,23 +26,32 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-
+/**
 var restaurants = [
 	{name: 'Apple iPad Pro', photo: 100, id: '001'},
 	{name: 'Apple iPhone 7', photo: 50, id: '002'},
 	{name: 'Apple Macbook', photo: 1627, id: '003'}
 ];
-
-//var cart = [];
+**/
 
 app.set('view engine', 'ejs');
 
+var restaurants = [];
+
 //may need to fit the request as: GET /api/read
 app.get("/read", function(req,res) {
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		restaurants = db.collection('restaurants').find();
+		db.close();
+		console.log('Disconnected MongoDB\n');
+	});
 	res.render("list", {c: restaurants});
 });
 
 app.get('/showdetails', function(req,res) {
+	/**
 	if (req.query.id != null) {
 		for (var i=0; i<restaurants.length; i++) {
 			if (restaurants[i].id == req.query.id) {
@@ -51,7 +66,31 @@ app.get('/showdetails', function(req,res) {
 		}
 	} else {
 		res.status(500).end('id missing!');
-	}
+	}**/
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		restaurants = db.collection('restaurants').find();
+		db.close();
+		console.log('Disconnected MongoDB\n');
+		if (req.query.id != null) {
+			for (var i=0; i<restaurants.length; i++) {
+				if (restaurants[i].id == req.query.id) {
+					var restaurant = restaurants[i];
+					break;
+				}
+			}
+			if (restaurants != null) {
+				res.render('details', {c: restaurant});
+			} else {
+				res.status(500).end(req.query.id + ' not found!');
+			}
+		} else {
+			res.status(500).end('id missing!');
+		}
+	});
+
+
         //--Googlemap
         /**MongoClient.connect(mongourl, function(err, db) {
     assert.equal(err,null);
@@ -86,14 +125,50 @@ app.get('/shoppingcart', function(req,res) {
 
 //add code for new
 app.get('/new', function(req, res){
-        res.render("new", {c: restaurants});
+	//MongoClient.connect(mongourl, function(err, db) {
+	//	assert.equal(err,null);
+	//	console.log('Connected to MongoDB\n');
+	//	//restaurants = db.collection('restaurants').find();
+	//	db.close();
+	//	console.log('Disconnected MongoDB\n');
+	//});
+	res.sendFile(__dirname + '/public/new.html');
+    //res.render("new", {c: restaurants});//
 });
 
 //add code for create new
 //may need to fit the request as: POST /api/create
 app.post('/create', function(req, res){
         //do sth to create
-        res.end('coming soon!')
+	var r = {};  // new restaurant to be inserted
+	r['address'] = {};
+	r.address.street = (req.body.street != null) ? req.body.street : null;
+	r.address.zipcode = (req.body.zipcode != null) ? req.body.zipcode : null;
+	r.address.building = (req.body.building != null) ? req.body.building : null;
+	r.address['coord'] = [];
+	r.address.coord.push(req.body.lon);
+	r.address.coord.push(req.body.lat);
+	r['borough'] = (req.body.borough != null) ? req.body.borough : null;
+	r['cuisine'] = (req.body.cuisine != null) ? req.body.cuisine : null;
+	r['name'] = (req.body.name != null) ? req.body.name : null;
+	r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
+	//
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		db.collection('restaurants').insertOne(r,
+			function(err,result) {
+				assert.equal(err,null);
+				console.log("insertOne() was successful _id = " +
+					JSON.stringify(result.insertedId));
+				db.close();
+				console.log('Disconnected from MongoDB\n');
+				res.writeHead(200, {"Content-Type": "text/plain"});
+				res.end('Insert was successful ' + JSON.stringify(r));
+			});
+	});
+        //res.end('coming soon!')
+	//res.redirect('/showdetails')
 });
 
 //useless code in this

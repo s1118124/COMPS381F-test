@@ -1,3 +1,9 @@
+//var http = require('http');
+//var url  = require('url');
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+var ObjectId = require('mongodb').ObjectID;
+var mongourl = 'mongodb://developer:developer@ds033046.mlab.com:33046/s1118124';
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -20,14 +26,13 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-
+/**
 var restaurants = [
 	{name: 'Apple iPad Pro', photo: 100, id: '001'},
 	{name: 'Apple iPhone 7', photo: 50, id: '002'},
 	{name: 'Apple Macbook', photo: 1627, id: '003'}
 ];
-
-//var cart = [];
+**/
 
 app.set('view engine', 'ejs');
 
@@ -37,6 +42,7 @@ app.get("/read", function(req,res) {
 });
 
 app.get('/showdetails', function(req,res) {
+	/**
 	if (req.query.id != null) {
 		for (var i=0; i<restaurants.length; i++) {
 			if (restaurants[i].id == req.query.id) {
@@ -45,13 +51,38 @@ app.get('/showdetails', function(req,res) {
 			}
 		}
 		if (restaurants != null) {
-			res.render('details', {c: restaurants});
+			res.render('details', {c: restaurant});
 		} else {
 			res.status(500).end(req.query.id + ' not found!');
 		}
 	} else {
 		res.status(500).end('id missing!');
-	}
+	}**/
+	var restaurants = [];
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		restaurants = db.collection('restaurants').find();
+		db.close();
+		console.log('Disconnected MongoDB\n');
+		if (req.query.id != null) {
+			for (var i=0; i<restaurants.length; i++) {
+				if (restaurants[i].id == req.query.id) {
+					var restaurant = restaurants[i];
+					break;
+				}
+			}
+			if (restaurants != null) {
+				res.render('details', {c: restaurant});
+			} else {
+				res.status(500).end(req.query.id + ' not found!');
+			}
+		} else {
+			res.status(500).end('id missing!');
+		}
+	});
+
+
         //--Googlemap
         /**MongoClient.connect(mongourl, function(err, db) {
     assert.equal(err,null);
@@ -86,6 +117,14 @@ app.get('/shoppingcart', function(req,res) {
 
 //add code for new
 app.get('/new', function(req, res){
+	var restaurants = [];
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		restaurants = db.collection('restaurants').find();
+		db.close();
+		console.log('Disconnected MongoDB\n');
+	});
         res.render("new", {c: restaurants});
 });
 
@@ -93,7 +132,35 @@ app.get('/new', function(req, res){
 //may need to fit the request as: POST /api/create
 app.post('/create', function(req, res){
         //do sth to create
-        res.end('coming soon!')
+	var r = {};  // new restaurant to be inserted
+	r['address'] = {};
+	r.address.street = (req.street != null) ? req.street : null;
+	r.address.zipcode = (req.zipcode != null) ? req.zipcode : null;
+	r.address.building = (req.building != null) ? req.building : null;
+	r.address['coord'] = [];
+	r.address.coord.push(req.lon);
+	r.address.coord.push(req.lat);
+	r['borough'] = (req.borough != null) ? req.borough : null;
+	r['cuisine'] = (req.cuisine != null) ? req.cuisine : null;
+	r['name'] = (req.name != null) ? req.name : null;
+	r['restaurant_id'] = (req.restaurant_id != null) ? req.restaurant_id : null;
+	//
+	MongoClient.connect(mongourl, function(err, db) {
+		assert.equal(err,null);
+		console.log('Connected to MongoDB\n');
+		db.collection('restaurants').insertOne(r,
+			function(err,result) {
+				assert.equal(err,null);
+				console.log("insertOne() was successful _id = " +
+					JSON.stringify(result.insertedId));
+				db.close();
+				console.log('Disconnected from MongoDB\n');
+				res.writeHead(200, {"Content-Type": "text/plain"});
+				res.end('Insert was successful ' + JSON.stringify(r));
+			});
+	});
+        //res.end('coming soon!')
+	res.redirect('/showdetails')
 });
 
 //useless code in this
