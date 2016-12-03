@@ -58,7 +58,7 @@ app.get("/read", function(req, res) {
 });
 	//res.render("list", {restaurants: result});
 
-app.get('/showdetails', function(req,res) {
+app.get('/details', function(req,res) {
 	/**
 	if (req.query.id != null) {
 		for (var i=0; i<restaurants.length; i++) {

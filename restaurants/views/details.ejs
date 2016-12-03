@@ -1,24 +1,24 @@
 <HTML>
 <head>
-  <title><%= c.name %></title>
+  <title><%= restaurants.name %></title>
   <!--add code[Googlemap]-->
   <!--script for google map??-->
   <!--end add code-->
 </head>
 <BODY>
-<H2><%= c.name %></H2>
-<% if (c.photo != null) { %>
+<H2><%= restaurants.name %></H2>
+<% if (restaurants.photo != null) { %>
 <p>
-  <img src="data:<%= c.mimetype %>;base64,<%= c.photo %>">
+  <img src="data:<%= restaurants.mimetype %>;base64,<%= restaurants.photo %>">
 <br>
 <% } %>
-<p>Name: <%= c.name %></p>
-<p>Cuisine: <%= c.cuisine %></p>
-<p>Street: <%= c.street %></p>
-<p>Building: <%= c.building %></p>
-<p>Zipcode: <%= c.zipcode %></p>
-<p>GPS: [ <%= c.lon %>,  <%=c.lat %> ]</p>
-<p>Rating: <ol><li> <%=c.rate %></li></ol></p>
+<p>Name: <%= restaurants.name %></p>
+<p>Cuisine: <%= restaurants.cuisine %></p>
+<p>Street: <%= restaurants.street %></p>
+<p>Building: <%= restaurants.building %></p>
+<p>Zipcode: <%= restaurants.zipcode %></p>
+<p>GPS: [ <%= restaurants.lon %>,  <%=restaurants.lat %> ]</p>
+<p>Rating: <ol><li> <%=restaurants.rate %></li></ol></p>
 <p>Created by: </p>
 
 
@@ -26,7 +26,7 @@
 <p>Google map: coming soon(map will be shown in here)</p>
 <!--Googlemap-->
 
-<!--<a href/add2cart?id=<%= c.id %>>add to shopping cart</a>-->
+<!--<a href/add2cart?id=<%= restaurants.id %>>add to shopping cart</a>-->
 <a href=/rate>Rate</a>
 <a href=/change>Edit</a>
 <a href=/remove>Delete</a>
