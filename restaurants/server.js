@@ -78,24 +78,28 @@ app.get('/details', function(req,res) {
 	MongoClient.connect(mongourl, function(err, db) {
 		assert.equal(err,null);
 		console.log('Connected to MongoDB\n');
-		restaurants = db.collection('restaurants').find();
+		db.collection('restaurants').find().toArray(function(err, result){;
 		db.close();
 		console.log('Disconnected MongoDB\n');
 		if (req.query.id != null) {
-			for (var i=0; i<restaurants.length; i++) {
-				if (restaurants[i].id == req.query.id) {
-					var restaurant = restaurants[i];
+			for (var i=0; i<result.length; i++) {
+				if (result[i]._id == req.query.id) {
+					var restaurant = result[i];
 					break;
 				}
 			}
-			if (restaurants != null) {
-				res.render('details', {c: restaurant});
+			if (result != null) {
+				res.render('details', {restaurants: result});
 			} else {
 				res.status(500).end(req.query.id + ' not found!');
 			}
 		} else {
 			res.status(500).end('id missing!');
 		}
+		})
+		//db.close();
+		//console.log('Disconnected MongoDB\n');
+
 	});
 
 

@@ -5,8 +5,8 @@
 <!--p><a href=/shoppingcart>shopping cart</a></p-->
 <p><a href=/new>New</a></p>
 <ol>
-  <% restaurants.forEach(function(restaurants) { %>
-  <ul><a href=/details?id=<%= restaurants.id %>><%= restaurants.name %></a></ul>
+  <% restaurants.forEach(function(r) { %>
+  <ul><a href=/details?id=<%= r._id %>><%= r.name %></a></ul>
   <% });   %>
  </ol>
 </BODY></HTML>
