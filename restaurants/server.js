@@ -79,17 +79,17 @@ app.get('/details', function(req,res) {
 		assert.equal(err,null);
 		console.log('Connected to MongoDB\n');
 		db.collection('restaurants').find().toArray(function(err, result){;
-		db.close();
-		console.log('Disconnected MongoDB\n');
+		//db.close();
+		//console.log('Disconnected MongoDB\n');
 		if (req.query.id != null) {
 			for (var i=0; i<result.length; i++) {
 				if (result[i]._id == req.query.id) {
-					var restaurant = result[i];
+					var r = result[i];
 					break;
 				}
 			}
 			if (result != null) {
-				res.render('details', {restaurants: result});
+				res.render('details', {restaurants: r});
 			} else {
 				res.status(500).end(req.query.id + ' not found!');
 			}
@@ -97,8 +97,8 @@ app.get('/details', function(req,res) {
 			res.status(500).end('id missing!');
 		}
 		})
-		//db.close();
-		//console.log('Disconnected MongoDB\n');
+		db.close();
+		console.log('Disconnected MongoDB\n');
 
 	});
 

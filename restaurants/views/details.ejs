@@ -14,10 +14,10 @@
 <% } %>
 <p>Name: <%= restaurants.name %></p>
 <p>Cuisine: <%= restaurants.cuisine %></p>
-<p>Street: <%= restaurants.street %></p>
-<p>Building: <%= restaurants.building %></p>
-<p>Zipcode: <%= restaurants.zipcode %></p>
-<p>GPS: [ <%= restaurants.lon %>,  <%=restaurants.lat %> ]</p>
+<p>Street: <%= restaurants.address.street %></p>
+<p>Building: <%= restaurants.address.building %></p>
+<p>Zipcode: <%= restaurants.address.zipcode %></p>
+<p>GPS: [ <%= restaurants.address.coord[0] %>,  <%=restaurants.address.coord[1] %> ]</p>
 <p>Rating: <ol><li> <%=restaurants.rate %></li></ol></p>
 <p>Created by: </p>
 
