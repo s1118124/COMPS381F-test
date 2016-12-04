@@ -9,6 +9,8 @@ var app = express();
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var fileUpload = require('express-fileupload');
+var url  = require('url');
+
 
 //--googlemap
 /**var assert = require('assert');
@@ -26,17 +28,8 @@ app.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
-/**
-var restaurants = [
-	{name: 'Apple iPad Pro', photo: 100, id: '001'},
-	{name: 'Apple iPhone 7', photo: 50, id: '002'},
-	{name: 'Apple Macbook', photo: 1627, id: '003'}
-];
-**/
 
 app.set('view engine', 'ejs');
-
-//var restaurants = [];
 
 //may need to fit the request as: GET /api/read
 app.get("/read", function(req, res) {
@@ -56,31 +49,12 @@ app.get("/read", function(req, res) {
 	
 
 });
-	//res.render("list", {restaurants: result});
 
 app.get('/details', function(req,res) {
-	/**
-	if (req.query.id != null) {
-		for (var i=0; i<restaurants.length; i++) {
-			if (restaurants[i].id == req.query.id) {
-				var restaurant = restaurants[i];
-				break;
-			}
-		}
-		if (restaurants != null) {
-			res.render('details', {c: restaurant});
-		} else {
-			res.status(500).end(req.query.id + ' not found!');
-		}
-	} else {
-		res.status(500).end('id missing!');
-	}**/
 	MongoClient.connect(mongourl, function(err, db) {
 		assert.equal(err,null);
 		console.log('Connected to MongoDB\n');
 		db.collection('restaurants').find().toArray(function(err, result){;
-		//db.close();
-		//console.log('Disconnected MongoDB\n');
 		if (req.query.id != null) {
 			for (var i=0; i<result.length; i++) {
 				if (result[i]._id == req.query.id) {
@@ -137,15 +111,7 @@ app.get('/shoppingcart', function(req,res) {
 
 //add code for new
 app.get('/new', function(req, res){
-	//MongoClient.connect(mongourl, function(err, db) {
-	//	assert.equal(err,null);
-	//	console.log('Connected to MongoDB\n');
-	//	//restaurants = db.collection('restaurants').find();
-	//	db.close();
-	//	console.log('Disconnected MongoDB\n');
-	//});
 	res.sendFile(__dirname + '/public/new.html');
-    //res.render("new", {c: restaurants});//
 });
 
 //add code for create new
@@ -163,8 +129,7 @@ app.post('/create', function(req, res){
 	r['borough'] = (req.body.borough != null) ? req.body.borough : null;
 	r['cuisine'] = (req.body.cuisine != null) ? req.body.cuisine : null;
 	r['name'] = (req.body.name != null) ? req.body.name : null;
-	//r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
-	//
+
 	MongoClient.connect(mongourl, function(err, db) {
 		assert.equal(err,null);
 		console.log('Connected to MongoDB\n');
@@ -179,18 +144,15 @@ app.post('/create', function(req, res){
 				res.end('Insert was successful ' + JSON.stringify(r));
 			});
 	});
-        //res.end('coming soon!')
-	//res.redirect('/showdetails')
+	res.render('details', {restaurants : r});
 });
 
 app.get('/change', function(req, res){
 	res.sendFile(__dirname + '/public/change.html');
-    //res.render("new", {c: restaurants});//
 });
 
 app.post('/change', function(req, res){
-        //do sth to create
-	var r = {};  // new restaurant to be inserted
+	var r = {};  
 	r['address'] = {};
 	r.address.street = (req.body.street != null) ? req.body.street : null;
 	r.address.zipcode = (req.body.zipcode != null) ? req.body.zipcode : null;
@@ -201,62 +163,17 @@ app.post('/change', function(req, res){
 	r['borough'] = (req.body.borough != null) ? req.body.borough : null;
 	r['cuisine'] = (req.body.cuisine != null) ? req.body.cuisine : null;
 	r['name'] = (req.body.name != null) ? req.body.name : null;
-	//r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
-	//
+	
 	MongoClient.connect(mongourl, function(err, db) {
 		console.log('Connected to MongoDB\n');
-		db.collection('restaurants').update(
-			{_id : r._id},
-			{$set : {name : req.body.name, cuisine : req.body.name, borough : req.body.borough, address : req.body.borough}}
-			/**
-			r,
-			function(err,result) {
-				assert.equal(err,null);
-				console.log("update() was successful _id = ");
-				db.close();
-				console.log('Disconnected from MongoDB\n');
-				res.writeHead(200, {"Content-Type": "text/plain"});
-				res.end('update was successful ');
-			});
-			**/
-		);
+		db.collection('restaurants').save(
+			{_id : ObjectId, name : r.name, cuisine : r.cuisine, address : r.address});
 		console.log('updated\n');
 		db.close();
 		console.log('Disconnected from MongoDB\n');
 		console.log("update() was successful _id = ");
-        //res.end('coming soon!')
-	//res.redirect('/showdetails')
+		res.render('details', {restaurants: r});
 });
 });
-
-//useless code in this
-app.get('/add2cart', function(req,res) {
-	//res.end('coming soon!')
-/**	
-	var product;
-	if (req.query.id != null) {
-		for (var i=0; i<products.length; i++) {
-			if (products[i].id == req.query.id) {
-				product = products[i];
-				break;
-			}
-		}
-		if (product != null) {
-
-			res.render('details', {c: product});
-		} else {
-			res.status(500).end(req.query.id + ' not found!');
-		}
-	} else {
-		res.status(500).end('id missing!');
-	}**/
-});
-
-//useless code in this
-/**
-app.get('/emptycart',function(req,res) {
-	res.end('coming soon!')
-})
-**/
 
 app.listen(process.env.PORT || 8099);
