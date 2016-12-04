@@ -163,7 +163,7 @@ app.post('/create', function(req, res){
 	r['borough'] = (req.body.borough != null) ? req.body.borough : null;
 	r['cuisine'] = (req.body.cuisine != null) ? req.body.cuisine : null;
 	r['name'] = (req.body.name != null) ? req.body.name : null;
-	r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
+	//r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
 	//
 	MongoClient.connect(mongourl, function(err, db) {
 		assert.equal(err,null);
@@ -181,6 +181,52 @@ app.post('/create', function(req, res){
 	});
         //res.end('coming soon!')
 	//res.redirect('/showdetails')
+});
+
+app.get('/change', function(req, res){
+	res.sendFile(__dirname + '/public/change.html');
+    //res.render("new", {c: restaurants});//
+});
+
+app.post('/change', function(req, res){
+        //do sth to create
+	var r = {};  // new restaurant to be inserted
+	r['address'] = {};
+	r.address.street = (req.body.street != null) ? req.body.street : null;
+	r.address.zipcode = (req.body.zipcode != null) ? req.body.zipcode : null;
+	r.address.building = (req.body.building != null) ? req.body.building : null;
+	r.address['coord'] = [];
+	r.address.coord.push(req.body.lon);
+	r.address.coord.push(req.body.lat);
+	r['borough'] = (req.body.borough != null) ? req.body.borough : null;
+	r['cuisine'] = (req.body.cuisine != null) ? req.body.cuisine : null;
+	r['name'] = (req.body.name != null) ? req.body.name : null;
+	//r['restaurant_id'] = (req.body.restaurant_id != null) ? req.body.restaurant_id : null;
+	//
+	MongoClient.connect(mongourl, function(err, db) {
+		console.log('Connected to MongoDB\n');
+		db.collection('restaurants').update(
+			{_id : r._id},
+			{$set : {name : req.body.name, cuisine : req.body.name, borough : req.body.borough, address : req.body.borough}}
+			/**
+			r,
+			function(err,result) {
+				assert.equal(err,null);
+				console.log("update() was successful _id = ");
+				db.close();
+				console.log('Disconnected from MongoDB\n');
+				res.writeHead(200, {"Content-Type": "text/plain"});
+				res.end('update was successful ');
+			});
+			**/
+		);
+		console.log('updated\n');
+		db.close();
+		console.log('Disconnected from MongoDB\n');
+		console.log("update() was successful _id = ");
+        //res.end('coming soon!')
+	//res.redirect('/showdetails')
+});
 });
 
 //useless code in this
